@@ -58,14 +58,14 @@ for i in range(s,e+1):
         print
 
         currtime = time.time()
-        urllib.urlretrieve(vidlink,ani_name+"-episode-%d.mp4" % i, dwbar)
+        urllib.urlretrieve(vidlink,ani_name.title()+"-episode-%d.mp4" % i, dwbar)
         currtime = time.time()-currtime
 
         print
-        print "Download finished in %dm %ds" % (int(currtime)/60, int(currtime)%60)
+        print "Download finished in %dm %ds\n" % (int(currtime)/60, int(currtime)%60)
     except Exception:
-        print "\n\nFailed : ", pageurl
-        failed_links+=pageurl
+        print "\nFailed : ", pageurl, "\n"
+        failed_links+=pageurl+"\n"
 
 print "Failed links :"
-print "\n".join(failed_links)
+print failed_links
