@@ -24,17 +24,8 @@ def dwbar(a,b,c):
                     int(esttime)/60, int(esttime)%60))
     sys.stdout.flush()
 
-print "Enter Anime Name : ",
-ani_name=raw_input();
-
-print "Staring Episode:",
-s=int(raw_input())
-print "Ending Episode:",
-e=int(raw_input())
-
-for i in range(s,e+1):
-    global currtime
-    pageurl="http://anilinkz.tv/"+ani_name.lower().replace(" ","-")+"-episode-%d" % i;
+def fetch(pageurl):
+    global currtime, failed_links
 
     try:
         print "Loading page:",pageurl
@@ -58,14 +49,47 @@ for i in range(s,e+1):
         print
 
         currtime = time.time()
-        urllib.urlretrieve(vidlink,ani_name.title()+"-episode-%d.mp4" % i, dwbar)
+        urllib.urlretrieve(vidlink,ani_name+"-episode-%d.mp4" % i, dwbar)
         currtime = time.time()-currtime
 
         print
         print "Download finished in %dm %ds\n" % (int(currtime)/60, int(currtime)%60)
     except Exception:
-        print "\nFailed : ", pageurl, "\n"
+        print "Failed : ", pageurl, "\n"
         failed_links+=pageurl+"\n"
 
+
+args = len(sys.argv)
+
+if args < 2:
+    print "Enter Anime Name : ",
+    ani_name=raw_input()
+else :
+    ani_name=sys.argv[1]
+
+if ani_name[:4] == "http":
+    fetch(ani_name)
+else:
+    ani_name=ani_name.title()
+    if args < 3:
+        print "Enter staring Episode:",
+        s=int(raw_input())
+    else :
+        s=int(sys.argv[2])
+
+    if args < 4:
+        print "Enter ending episode:",
+        e=int(raw_input())
+        print
+    else :
+        e=int(sys.argv[3])
+
+    print "Dowloading ", ani_name, " from episode ", s, " to ", e
+    print
+
+    for i in range(int(s),int(e)+1):
+        pageurl="http://anilinkz.tv/"+ani_name.lower().replace(" ","-")+"-episode-%d" % i;
+        fetch(pageurl)
+
 print "Failed links :"
-print failed_links
+print "".join(failed_links)
