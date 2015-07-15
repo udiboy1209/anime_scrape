@@ -10,14 +10,22 @@ from bs4 import BeautifulSoup
 opener = urllib2.build_opener()
 opener.addheaders = [('User-agent', 'Mozilla/5.0 (X11; U; Linux i686) Gecko/20071127 Firefox/2.0.0.11')]
 failed_links=[]
+totbytes=0
+speed=0
 
 def escapeall(url):
     return re.sub("[A-Z\~\!\@\#\$\*\{\}\[\]\-\+\.]",'',url)
 
 def dwbar(a,b,c):
-    global currtime
+    global updtime, totbytes, speed
 
-    speed = (a*b)/((time.time()-currtime)*1000.0)
+    totbytes+=b
+
+    if time.time()-updtime > 0.5:
+        speed = (totbytes)/((time.time()-updtime)*1000.0)
+        updtime = time.time()
+        totbytes=0;
+
     esttime = ((c-a*b)/1000.0)/speed if speed!=0 else 0
     sys.stdout.write("\rDownload progress: %.2fM of %.2fM - %.2f kB/s - %dm %ds left      " %
                     ((a*b)/1000000.0,c/1000000.0, speed,
@@ -25,7 +33,7 @@ def dwbar(a,b,c):
     sys.stdout.flush()
 
 def fetch(pageurl):
-    global currtime, failed_links
+    global updtime, failed_links
 
     try:
         print "Loading page:",pageurl
@@ -49,12 +57,14 @@ def fetch(pageurl):
         print
 
         currtime = time.time()
+        updtime=currtime
         urllib.urlretrieve(vidlink,ani_name+"-episode-%d.mp4" % i, dwbar)
         currtime = time.time()-currtime
 
         print
         print "Download finished in %dm %ds\n" % (int(currtime)/60, int(currtime)%60)
-    except Exception:
+    except Exception as e:
+        print e
         print "Failed : ", pageurl, "\n"
         failed_links+=pageurl+"\n"
 
