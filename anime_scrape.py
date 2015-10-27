@@ -34,25 +34,29 @@ def dwbar(a,b,c):
 
 def fetch(pageurl):
     global updtime, failed_links
+    html = ""
 
     try:
         print "Loading page:",pageurl
 
         handle = opener.open(pageurl)
-        html = handle.read()
+        html = BeautifulSoup(handle.read(),"lxml")
 
-        player = BeautifulSoup(html).find("div", {"id":"player"});
+        player = html.find("div", {"id":"player"});
 
-        encoded = player.find_all('script')[1].text[35:-5].encode('ascii')
-        decoded = urllib2.unquote(escapeall(encoded)).encode('ascii')
-        playlink = BeautifulSoup(decoded).find('iframe')['src']
+        #encoded = player.find_all('script')[1].text[35:-5].encode('ascii')
+        #decoded = urllib2.unquote(escapeall(encoded)).encode('ascii')
+        playlink = player.find('iframe')['src']
 
         print "Loading player:", playlink
 
         handle = opener.open(playlink)
-        html = handle.read()
+        html = BeautifulSoup(handle.read(),"lxml")
 
-        vidlink = BeautifulSoup(html).find('video').find('source')['src']
+        vidlink = html.find('video').find('source')['src']
+        print vidlink
+        if vidlink[:5] not in ['http:','https']:
+            vidlink = 'http:'+vidlink
         print "Downloading: ", vidlink
         print
 
@@ -66,6 +70,13 @@ def fetch(pageurl):
     except Exception as e:
         print e
         print "Failed : ", pageurl, "\n"
+
+        print "HTML output to ep%d.html" %i
+        flog=open("ep%d.html"%i, 'w+')
+        flog.write(html)
+        flog.flush()
+        flog.close()
+
         failed_links+=pageurl+"\n"
 
 
