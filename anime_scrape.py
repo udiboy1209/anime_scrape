@@ -93,22 +93,28 @@ if ani_name[:4] == "http":
 else:
     ani_name=ani_name.title()
     if args < 3:
-        print "Enter staring Episode:",
-        s=int(raw_input())
+        print "Separate different episodes with a ','.",
+        print "Range of episodes specified using 'n-m'."
+        print "Eg. 2-5,7,9-11"
+        print "Enter episodes:",
+        epstr=raw_input()
     else :
-        s=int(sys.argv[2])
+        epstr=sys.argv[2]
 
-    if args < 4:
-        print "Enter ending episode:",
-        e=int(raw_input())
-        print
-    else :
-        e=int(sys.argv[3])
+    ep = []
+    for epi in epstr.split(","):
+        r = epi.split("-")
+        if len(r) == 1:
+            r.append(r[0])
 
-    print "Dowloading ", ani_name, " from episode ", s, " to ", e
+        ep.extend(range(int(r[0]),int(r[1])+1))
+
+    ep = list(set(ep))
+
+    print "Dowloading ", ani_name, " episode ", ep
     print
 
-    for i in range(int(s),int(e)+1):
+    for i in ep:
         pageurl="http://anilinkz.tv/"+ani_name.lower().replace(" ","-")+"-episode-%d" % i;
         fetch(pageurl)
 
