@@ -1,3 +1,5 @@
+**ARCHIVED:** Anilinkz itself is no more 😢 so this scraper is useless.
+
 Anime Scrape
 ==============
 
